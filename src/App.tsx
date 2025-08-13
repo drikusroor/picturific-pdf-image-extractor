@@ -6,6 +6,8 @@ import JSZip from 'jszip'
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf'
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
 
+import './index.css'
+
 type Extracted = {
   id: string
   pageIndex: number
@@ -219,8 +221,21 @@ export default function App() {
         <Dropzone onFiles={handleFiles} />
 
         {busy && (
-          <div className="mt-6 rounded-xl bg-gray-100 p-4 text-sm">
-            Processing PDF… This might take a moment for large files.
+          <div className="mt-6">
+            <div className="rounded-xl bg-gray-100 p-4 text-sm mb-4 animate-pulse">
+              <div className="h-4 w-1/3 bg-gray-300 rounded mb-2" />
+              <div className="h-3 w-1/2 bg-gray-200 rounded mb-1" />
+              <div className="h-3 w-1/4 bg-gray-200 rounded" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-xl bg-white p-3 shadow border animate-pulse">
+                  <div className="w-full h-40 bg-gray-200 rounded-md mb-2 shimmer" />
+                  <div className="h-3 w-2/3 bg-gray-200 rounded mb-1" />
+                  <div className="h-3 w-1/3 bg-gray-100 rounded" />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
