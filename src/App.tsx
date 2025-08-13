@@ -102,15 +102,10 @@ export default function App() {
 					const store = page.objs && page.objs._objs ? page.objs._objs : {};
 
 					// Debug: log all object keys and types for this page
-					if (process.env.NODE_ENV !== "production") {
-						console.log(
-							`PDF page ${pageIndex} object keys:`,
-							Object.keys(store),
-						);
-						for (const [k, v] of Object.entries(store)) {
-							if (v && typeof v === "object") {
-								console.log(`  [${k}] keys:`, Object.keys(v));
-							}
+					console.log(`PDF page ${pageIndex} object keys:`, Object.keys(store));
+					for (const [k, v] of Object.entries(store)) {
+						if (v && typeof v === "object") {
+							console.log(`  [${k}] keys:`, Object.keys(v));
 						}
 					}
 
