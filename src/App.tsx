@@ -86,6 +86,16 @@ export default function App() {
         // @ts-ignore - internal access
         const store = page.objs && page.objs._objs ? page.objs._objs : {}
 
+        // Debug: log all object keys and types for this page
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`PDF page ${pageIndex} object keys:`, Object.keys(store))
+          for (const [k, v] of Object.entries(store)) {
+            if (v && typeof v === 'object') {
+              console.log(`  [${k}] keys:`, Object.keys(v))
+            }
+          }
+        }
+
         const candidates: Array<[string, any]> = Object.entries(store)
           .filter(([_, v]) => v && typeof v === 'object' && ('data' in v) && ('width' in v) && ('height' in v))
 
@@ -130,7 +140,33 @@ export default function App() {
       }
 
       if (unique.length === 0) {
-        setError('No embedded images were found. (Some PDFs only have vector graphics or images baked into page bitmaps.)')
+        // Fallback: rasterize each page as PNG if no embedded images found
+        for (let pageIndex = 1; pageIndex <= pdf.numPages; pageIndex++) {
+          const page = await pdf.getPage(pageIndex)
+          const viewport = page.getViewport({ scale: 2 }) // higher res for raster
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')
+          if (!ctx) continue
+          canvas.width = Math.max(1, Math.floor(viewport.width))
+          canvas.height = Math.max(1, Math.floor(viewport.height))
+          await page.render({ canvasContext: ctx, viewport }).promise
+          const blob: Blob = await new Promise((res) => canvas.toBlob(b => res(b!), 'image/png'))
+          const url = URL.createObjectURL(blob)
+          unique.push({
+            id: `raster-page-${pageIndex}`,
+            pageIndex,
+            width: canvas.width,
+            height: canvas.height,
+            blob,
+            url,
+            format: 'png',
+          })
+        }
+        if (unique.length === 0) {
+          setError('No embedded images or rasterized pages could be extracted. (Some PDFs only have vector graphics or are encrypted.)')
+        } else {
+          setError('No embedded images were found. Fallback: rasterized each page as a PNG. This is not perfect extraction—vector graphics, text, and image quality may differ from the originals.')
+        }
       }
       setImages(unique)
     } catch (e: any) {
