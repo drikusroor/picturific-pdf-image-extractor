@@ -4,7 +4,7 @@ import JSZip from "jszip";
 // Use the legacy build for widest compatibility + access to OPS/ImageKind
 // and wire up the Web Worker cleanly in Vite.
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf";
-pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+pdfjs.GlobalWorkerOptions.workerSrc = `${import.meta.env.BASE_URL || "/"}pdf.worker.min.mjs`;
 
 import "./index.css";
 
