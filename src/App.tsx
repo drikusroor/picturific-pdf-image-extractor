@@ -1,4 +1,6 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+/// <reference types="vite/client" />
+import type React from "react";
+import { useCallback, useRef, useState } from "react";
 import JSZip from "jszip";
 
 // Use the legacy build for widest compatibility + access to OPS/ImageKind
@@ -243,7 +245,7 @@ export default function App() {
 							Picturific
 						</span>
 						<span className="inline-block rotate-6 text-3xl md:text-4xl">
-							🕶️
+								🕶️
 						</span>
 					</div>
 					<div className="text-lg md:text-xl font-mono text-gray-700 mb-1">
