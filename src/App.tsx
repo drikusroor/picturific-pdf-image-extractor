@@ -1,12 +1,6 @@
 /// <reference types="vite/client" />
 import type React from "react";
 import { useCallback, useRef, useState } from "react";
-import JSZip from "jszip";
-
-// Use the legacy build for widest compatibility + access to OPS/ImageKind
-// and wire up the Web Worker cleanly in Vite.
-import * as pdfjs from "pdfjs-dist/legacy/build/pdf";
-pdfjs.GlobalWorkerOptions.workerSrc = `${import.meta.env.BASE_URL || "/"}pdf.worker.min.mjs`;
 
 import "./index.css";
 
@@ -78,6 +72,9 @@ export default function App() {
 			setBusy(true);
 			try {
 				const ab = await file.arrayBuffer();
+				// Dynamically import pdfjs-dist
+				const pdfjs = await import("pdfjs-dist/legacy/build/pdf");
+				pdfjs.GlobalWorkerOptions.workerSrc = `${import.meta.env.BASE_URL || "/"}pdf.worker.min.mjs`;
 				const loadingTask = pdfjs.getDocument({ data: ab });
 				const pdf = await loadingTask.promise;
 				setMeta({ pages: pdf.numPages, filename: file.name });
@@ -222,6 +219,8 @@ export default function App() {
 	const total = images.length;
 
 	const downloadAll = useCallback(async () => {
+		// Dynamically import jszip
+		const JSZip = (await import("jszip")).default;
 		const zip = new JSZip();
 		images.forEach((img, i) => {
 			const name = `page-${img.pageIndex}_img-${i + 1}_${img.width}x${img.height}.${img.format}`;
@@ -245,7 +244,7 @@ export default function App() {
 							Picturific
 						</span>
 						<span className="inline-block rotate-6 text-3xl md:text-4xl">
-								🕶️
+							🕶️
 						</span>
 					</div>
 					<div className="text-lg md:text-xl font-mono text-gray-700 mb-1">
